@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Florescer · Painel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3EA;
+    --blush:#E9C7B9;
+    --terracotta:#C97B58;
+    --plum:#4F2F3D;
+    --sage:#94A584;
+    --ink:#3A2C28;
+    --paper:#FFFCF8;
+    --line: rgba(79,47,61,0.14);
+    --radius-organic: 38% 62% 58% 42% / 48% 40% 60% 52%;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; letter-spacing:-0.01em; color:var(--plum); margin:0; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- Login Screen ---------- */
+  .login-screen{
+    position:fixed; inset:0; background:var(--cream); display:flex; align-items:center; justify-content:center;
+    z-index:1000;
+  }
+  .login-screen.hidden{ display:none; }
+
+  .login-container{
+    background:var(--paper); border-radius:32px; border:1px solid var(--line);
+    padding:48px; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(58,44,40,.15);
+  }
+
+  .login-header{ text-align:center; margin-bottom:36px; }
+  .login-header .logo-mark{
+    width:48px; height:48px; border-radius:var(--radius-organic);
+    background: linear-gradient(135deg, var(--terracotta), var(--blush));
+    margin:0 auto 16px;
+  }
+  .login-header h1{ font-size:24px; margin-bottom:8px; }
+  .login-header p{ color:var(--plum); opacity:.7; font-size:14px; }
+
+  .form-group{ margin-bottom:20px; }
+  .form-group label{
+    display:block; font-size:13px; letter-spacing:.04em; color:var(--plum);
+    margin-bottom:8px; font-weight:500;
+  }
+  .form-group input{
+    width:100%; padding:13px 16px; border:1.5px solid var(--line); border-radius:14px;
+    background:var(--cream); font-family:'Work Sans',sans-serif; font-size:15px; color:var(--ink);
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .form-group input:focus{
+    outline:none; border-color:var(--terracotta); background:var(--paper);
+  }
+
+  .btn{
+    border:none; cursor:pointer; font-family:'Work Sans',sans-serif;
+    font-size:15px; font-weight:500; padding:15px 28px; border-radius:30px;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn-primary{
+    background:var(--plum); color:var(--paper);
+    box-shadow:0 10px 24px -8px rgba(79,47,61,.55);
+    width:100%;
+  }
+  .btn-primary:hover{ background:var(--terracotta); transform:translateY(-2px); }
+  .btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
+
+  .form-msg{
+    font-size:13.5px; padding:12px 14px; border-radius:12px; margin-top:16px; display:none;
+  }
+  .form-msg.ok{ display:block; background:#EAF1E3; color:#4C6B3A; }
+  .form-msg.err{ display:block; background:#F6E3DC; color:#9C4A2E; }
+
+  /* ---------- Main Panel ---------- */
+  .main-content{
+    display:none;
+  }
+  .main-content.visible{
+    display:block;
+  }
+
+  nav{
+    position:sticky; top:0; z-index:50;
+    background: rgba(251,243,234,0.86);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:30px; height:30px; border-radius:var(--radius-organic);
+    background: linear-gradient(135deg, var(--terracotta), var(--blush));
+    flex-shrink:0;
+  }
+  .logo-text{ font-family:'Fraunces', serif; font-size:21px; font-style:italic; color:var(--plum); }
+  .nav-tag{
+    font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--terracotta);
+    font-weight:600; border:1px solid var(--line); padding:6px 12px; border-radius:20px;
+  }
+  .nav-actions{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .nav-link{
+    color:var(--plum); text-decoration:none; font-size:14px; font-weight:500;
+    border:1px solid transparent; padding:8px 10px; border-radius:18px;
+  }
+  .nav-link:hover{ border-color:var(--line); color:var(--terracotta); }
+  .logout-btn{
+    background:transparent; color:var(--plum); border:1.5px solid var(--line);
+    padding:10px 20px; border-radius:30px; font-size:14px; cursor:pointer;
+    transition:all .25s;
+  }
+  .logout-btn:hover{ border-color:var(--terracotta); color:var(--terracotta); }
+
+  section{ position:relative; padding:56px 0; }
+
+  .section-head{ max-width:560px; margin-bottom:38px; }
+  .section-tag{
+    font-size:13px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--sage); font-weight:600; display:block; margin-bottom:12px;
+  }
+  .section-head h2{ font-size:clamp(28px,3.4vw,40px); line-height:1.12; }
+  .section-head p{ color:var(--plum); opacity:.75; font-size:16px; line-height:1.6; margin-top:14px; }
+
+  .agenda-toolbar{
+    display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; gap:20px; flex-wrap:wrap;
+  }
+
+  .calendar-shell{
+    display:grid; grid-template-columns:1.3fr 1fr; gap:28px; align-items:start;
+  }
+  .calendar-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:32px; padding:28px 28px 22px;
+  }
+  .cal-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+  .cal-nav .month-label{ font-family:'Fraunces',serif; font-size:21px; color:var(--plum); text-transform:capitalize; }
+  .cal-nav-btns{ display:flex; gap:8px; }
+
+  .cal-weekdays{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:8px;
+  }
+  .cal-weekdays span{
+    text-align:center; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--plum); opacity:.55; font-weight:600;
+  }
+  .cal-grid{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
+  }
+  .cal-day{
+    position:relative; aspect-ratio:1; border-radius:14px; border:1.5px solid transparent;
+    background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; transition: all .2s ease; gap:4px;
+  }
+  .cal-day:hover{ border-color:var(--terracotta); }
+  .cal-day.empty{ background:transparent; cursor:default; pointer-events:none; }
+  .cal-day .num{ font-size:14px; color:var(--ink); font-weight:500; }
+  .cal-day.today .num{ color:var(--terracotta); font-weight:700; }
+  .cal-day.today{ border-color:var(--sage); }
+  .cal-day.has-appt{ background:var(--blush); }
+  .cal-day.has-appt .num{ color:var(--plum); }
+  .cal-day.selected{ background:var(--plum); border-color:var(--plum); }
+  .cal-day.selected .num{ color:var(--cream); }
+  .cal-dot{ width:5px; height:5px; border-radius:50%; background:var(--terracotta); }
+  .cal-count{
+    position:absolute; top:4px; right:6px; font-size:9.5px; color:var(--terracotta); font-weight:700;
+  }
+
+  .day-panel{
+    background:var(--paper); border:1px solid var(--line); border-radius:28px; padding:26px; min-height:340px;
+  }
+  .day-panel h3{ font-size:18px; margin-bottom:4px; }
+  .day-panel .day-sub{ font-size:13px; color:var(--plum); opacity:.6; margin-bottom:20px; }
+
+  .agenda-list{ display:flex; flex-direction:column; gap:14px; }
+  .agenda-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px;
+    padding:20px 24px; display:flex; align-items:center; gap:20px;
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .agenda-card:hover{ box-shadow:0 14px 30px -20px rgba(79,47,61,.4); }
+
+  .agenda-avatar{
+    width:46px; height:46px; flex-shrink:0; border-radius:50% 50% 50% 14%;
+    background: linear-gradient(135deg, var(--terracotta), var(--blush));
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); font-family:'Fraunces',serif; font-weight:600; font-size:17px;
+  }
+  .agenda-info{ flex:1; min-width:0; }
+  .agenda-info .name{ font-family:'Fraunces',serif; font-size:17px; color:var(--plum); }
+  .agenda-info .meta{ font-size:13px; color:var(--plum); opacity:.65; margin-top:3px; }
+
+  .agenda-when{ text-align:right; font-size:13.5px; color:var(--plum); }
+  .agenda-when .date{ font-weight:600; }
+
+  .agenda-actions{ display:flex; gap:8px; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line);
+    background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--plum); transition: all .2s ease;
+  }
+  .icon-btn:hover{ border-color:var(--terracotta); color:var(--terracotta); background:rgba(201,123,88,.08); }
+  .icon-btn.danger:hover{ border-color:#9C4A2E; color:#9C4A2E; background:rgba(156,74,46,.08); }
+
+  .services-shell{
+    display:grid; grid-template-columns:minmax(280px,.85fr) 1.15fr; gap:28px; align-items:start;
+  }
+  .service-panel{
+    background:var(--paper); border:1px solid var(--line); border-radius:28px; padding:26px;
+  }
+  .service-panel h3{ font-size:20px; margin-bottom:18px; }
+  .service-form{ display:grid; gap:16px; }
+  .service-form .form-group{ margin-bottom:0; }
+  .service-form input,
+  .service-form textarea{
+    width:100%; padding:13px 16px; border:1.5px solid var(--line); border-radius:14px;
+    background:var(--cream); font-family:'Work Sans',sans-serif; font-size:15px; color:var(--ink);
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .service-form textarea{ min-height:96px; resize:vertical; line-height:1.45; }
+  .service-form input:focus,
+  .service-form textarea:focus{
+    outline:none; border-color:var(--terracotta); background:var(--paper);
+  }
+  .color-row{ display:grid; grid-template-columns:72px 1fr; gap:12px; align-items:center; }
+  .service-form input[type="color"]{ height:48px; padding:5px; cursor:pointer; }
+  .services-list{ display:grid; gap:14px; }
+  .service-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px;
+    padding:20px 22px; display:grid; grid-template-columns:44px 1fr auto; gap:16px; align-items:center;
+  }
+  .service-dot{
+    width:36px; height:36px; border-radius:50% 50% 50% 12px; box-shadow:0 8px 18px -12px rgba(79,47,61,.6);
+  }
+  .service-name{ font-family:'Fraunces',serif; font-size:18px; color:var(--plum); }
+  .service-desc{ font-size:13.5px; color:var(--plum); opacity:.68; line-height:1.45; margin-top:4px; }
+  .service-price{ font-size:14px; font-weight:600; color:var(--terracotta); white-space:nowrap; }
+  .schedule-panel{
+    background:var(--paper); border:1px solid var(--line); border-radius:28px; padding:26px;
+  }
+  .schedule-grid{ display:grid; gap:12px; }
+  .schedule-row{
+    display:grid; grid-template-columns:1fr 96px 120px 120px 120px; gap:12px; align-items:center;
+    background:var(--cream); border:1px solid var(--line); border-radius:18px; padding:14px;
+  }
+  .schedule-day{ font-family:'Fraunces',serif; font-size:18px; color:var(--plum); }
+  .schedule-row label{ font-size:12px; color:var(--plum); opacity:.7; display:block; margin-bottom:5px; }
+  .schedule-row input{
+    width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:12px;
+    background:var(--paper); font-family:'Work Sans',sans-serif; color:var(--ink);
+  }
+  .schedule-active{ display:flex; align-items:center; gap:8px; color:var(--plum); font-size:14px; }
+  .schedule-active input{ width:18px; height:18px; accent-color:var(--terracotta); }
+
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--plum); opacity:.6; font-size:15px;
+  }
+
+  footer{
+    border-top:1px solid var(--line); padding:40px 0; text-align:center;
+    color:var(--plum); opacity:.6; font-size:13.5px;
+  }
+
+  @media (max-width: 900px){
+    .agenda-card{ flex-wrap:wrap; }
+    .agenda-when{ text-align:left; }
+    .calendar-shell{ grid-template-columns:1fr; }
+    .services-shell{ grid-template-columns:1fr; }
+    .service-card{ grid-template-columns:40px 1fr; }
+    .service-price{ grid-column:2; }
+    .schedule-row{ grid-template-columns:1fr 1fr; }
+    .schedule-day{ grid-column:1 / -1; }
+    .login-container{ padding:32px; }
+  }
+
+  :focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN SCREEN ========== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo-mark"></div>
+      <h1>Painel Administrativo</h1>
+      <p>Acesso restrito</p>
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" placeholder="admin@florescer.com" required>
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" placeholder="••••••••" required>
+      </div>
+      <button class="btn btn-primary" type="submit" id="loginBtn">Entrar</button>
+      <div class="form-msg" id="loginMsg"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MAIN PANEL ========== -->
+<div class="main-content" id="mainContent">
+  <nav>
+    <div class="wrap">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <span class="logo-text">Florescer</span>
+      </div>
+      <div class="nav-actions">
+        <a class="nav-link" href="#agenda">Agenda</a>
+        <a class="nav-link" href="#horariosAdmin">Horários</a>
+        <a class="nav-link" href="#servicosAdmin">Serviços</a>
+        <span class="nav-tag">Painel administrativo</span>
+        <button class="logout-btn" id="logoutBtn">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <section id="agenda">
+    <div class="wrap">
+      <div class="agenda-toolbar">
+        <div class="section-head" style="margin-bottom:0;">
+          <span class="section-tag">Painel</span>
+          <h2>Próximos agendamentos.</h2>
+        </div>
+        <button class="btn btn-primary" id="refreshBtn" style="padding:11px 20px; font-size:14px;">↻ Atualizar</button>
+      </div>
+      <div class="calendar-shell">
+        <div class="calendar-card">
+          <div class="cal-nav">
+            <span class="month-label" id="monthLabel">—</span>
+            <div class="cal-nav-btns">
+              <button class="icon-btn" id="prevMonth">‹</button>
+              <button class="icon-btn" id="todayBtn">●</button>
+              <button class="icon-btn" id="nextMonth">›</button>
+            </div>
+          </div>
+          <div class="cal-weekdays">
+            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <div class="day-panel" id="dayPanel">
+          <div class="empty-state">
+            Clique em um dia para ver os horários.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="horariosAdmin">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-tag">Horários</span>
+        <h2>Disponibilidade semanal.</h2>
+        <p>Defina os dias e horários em que o studio atende. O cliente só verá horários livres dentro dessas regras.</p>
+      </div>
+      <div class="schedule-panel">
+        <form id="scheduleForm">
+          <div class="schedule-grid" id="scheduleGrid"></div>
+          <button class="btn btn-primary" type="submit" id="scheduleSubmitBtn" style="margin-top:20px; max-width:260px;">Salvar horários</button>
+          <div class="form-msg" id="scheduleMsg"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="servicosAdmin">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="section-tag">Serviços</span>
+        <h2>Cadastro e catálogo.</h2>
+      </div>
+
+      <div class="services-shell">
+        <div class="service-panel">
+          <h3>Cadastrar novo serviço</h3>
+          <form class="service-form" id="serviceForm">
+            <div class="form-group">
+              <label for="serviceName">Nome</label>
+              <input id="serviceName" type="text" required>
+            </div>
+            <div class="form-group">
+              <label for="serviceDescription">Descrição</label>
+              <textarea id="serviceDescription" required></textarea>
+            </div>
+            <div class="form-group color-row">
+              <input id="serviceColor" type="color" value="#C97B58" required>
+              <div>
+                <label for="serviceColor">Cor do ícone</label>
+                <div class="service-desc">A cor aparece no card do site do cliente.</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="serviceDuration">Duração em minutos</label>
+              <input id="serviceDuration" type="number" min="1" step="1" required>
+            </div>
+            <div class="form-group">
+              <label for="servicePrice">Preço</label>
+              <input id="servicePrice" type="number" min="0" step="0.01" required>
+            </div>
+            <button class="btn btn-primary" type="submit" id="serviceSubmitBtn">Cadastrar serviço</button>
+            <div class="form-msg" id="serviceMsg"></div>
+          </form>
+        </div>
+
+        <div class="service-panel">
+          <h3>Serviços cadastrados</h3>
+          <div class="services-list" id="servicesList">
+            <div class="empty-state">Carregando serviços...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      Florescer Studio · Painel administrativo
+    </div>
+  </footer>
+</div>
+
+<script>
+// ============ CONFIGURAÇÃO ============
+const API_BASE = "http://127.0.0.1:8000";
+let token = localStorage.getItem("admin_token");
+
+// ============ ELEMENTOS ============
+const loginScreen = document.getElementById('loginScreen');
+const mainContent = document.getElementById('mainContent');
+const loginForm = document.getElementById('loginForm');
+const loginMsg = document.getElementById('loginMsg');
+const logoutBtn = document.getElementById('logoutBtn');
+
+const calGrid = document.getElementById('calGrid');
+const monthLabel = document.getElementById('monthLabel');
+const dayPanel = document.getElementById('dayPanel');
+const refreshBtn = document.getElementById('refreshBtn');
+const serviceForm = document.getElementById('serviceForm');
+const serviceMsg = document.getElementById('serviceMsg');
+const serviceSubmitBtn = document.getElementById('serviceSubmitBtn');
+const servicesList = document.getElementById('servicesList');
+const scheduleForm = document.getElementById('scheduleForm');
+const scheduleGrid = document.getElementById('scheduleGrid');
+const scheduleMsg = document.getElementById('scheduleMsg');
+const scheduleSubmitBtn = document.getElementById('scheduleSubmitBtn');
+
+// ============ ESTADO ============
+let allAgendamentos = [];
+let allServicos = [];
+let allHorariosTrabalho = [];
+let viewDate = new Date();
+let selectedDateStr = null;
+
+// ============ LOGIN ============
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginMsg.className = 'form-msg';
+  const loginBtn = document.getElementById('loginBtn');
+  
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value.trim();
+  
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Entrando...';
+  
+  try {
+    const res = await fetch(`${API_BASE}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    
+    if (!res.ok) throw new Error('Credenciais inválidas');
+    
+    const data = await res.json();
+    token = data.access_token;
+    localStorage.setItem('admin_token', token);
+    
+    loginMsg.textContent = 'Acesso liberado! ✨';
+    loginMsg.className = 'form-msg ok';
+    
+    setTimeout(() => {
+      loginScreen.classList.add('hidden');
+      mainContent.classList.add('visible');
+      fetchAgendamentos();
+      fetchServicos();
+    }, 800);
+  } catch (err) {
+    loginMsg.textContent = err.message;
+    loginMsg.className = 'form-msg err';
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Entrar';
+  }
+});
+
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('admin_token');
+  token = null;
+  loginScreen.classList.remove('hidden');
+  mainContent.classList.remove('visible');
+  loginForm.reset();
+  document.getElementById('email').focus();
+});
+
+// ============ VERIFICAR SE JÁ ESTÁ LOGADO ============
+ if (token) {
+  loginScreen.classList.add('hidden');
+  mainContent.classList.add('visible');
+fetchAgendamentos();
+fetchServicos();
+}
+;
+// ============ FUNÇÕES ============
+function pad(n) { return String(n).padStart(2, '0'); }
+function toDateStr(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
+function formatMoney(value) {
+  return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[char]));
+}
+function safeColor(value) {
+  return /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#C97B58';
+}
+
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+}
+
+function normalize(row) {
+  if (Array.isArray(row)) {
+    const [id, nome, email, telefone, data, hora] = row;
+    return { id, nome, email, telefone, data, hora };
+  }
+  return row;
+}
+
+async function fetchAgendamentos() {
+  try {
+    const res = await fetch(`${API_BASE}/agendamentos`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Erro ao buscar agendamentos');
+    const data = await res.json();
+    allAgendamentos = (data || []).map(normalize);
+  } catch (err) {
+    console.error(err);
+    allAgendamentos = [];
+  }
+  renderCalendar();
+  renderDayPanel();
+}
+
+async function fetchServicos() {
+  try {
+    const res = await fetch(`${API_BASE}/mostrar_servicos`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Erro ao buscar serviços');
+    allServicos = await res.json();
+  } catch (err) {
+    console.error(err);
+    allServicos = [];
+  }
+  renderServicos();
+}
+
+function renderServicos() {
+  if (!allServicos.length) {
+    servicesList.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado.</div>';
+    return;
+  }
+
+  servicesList.innerHTML = allServicos.map(servico => `
+    <div class="service-card">
+      <div class="service-dot" style="background:${safeColor(servico.cor)};"></div>
+      <div>
+        <div class="service-name">${escapeHTML(servico.nome)}</div>
+        <div class="service-desc">${escapeHTML(servico.descricao)}</div>
+      </div>
+      <div class="service-price">${formatMoney(servico.preco)}</div>
+    </div>
+  `).join('');
+}
+
+function renderCalendar() {
+  const y = viewDate.getFullYear();
+  const m = viewDate.getMonth();
+  const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  monthLabel.textContent = `${monthNames[m]} de ${y}`;
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayStr = toDateStr(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+  const counts = {};
+  allAgendamentos.forEach(a => {
+    if (!a.data) return;
+    counts[a.data] = (counts[a.data] || 0) + 1;
+  });
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-day empty"></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = toDateStr(y, m, d);
+    const count = counts[dateStr] || 0;
+    const classes = ['cal-day'];
+    if (dateStr === todayStr) classes.push('today');
+    if (count > 0) classes.push('has-appt');
+    if (dateStr === selectedDateStr) classes.push('selected');
+    html += `
+      <div class="${classes.join(' ')}" data-date="${dateStr}">
+        <span class="num">${d}</span>
+        ${count > 0 ? `<span class="cal-dot"></span>` : ''}
+        ${count > 1 ? `<span class="cal-count">${count}</span>` : ''}
+      </div>`;
+  }
+  calGrid.innerHTML = html;
+}
+
+function renderDayPanel() {
+  if (!selectedDateStr) {
+    dayPanel.innerHTML = `<div class="empty-state">Clique em um dia para ver os horários.</div>`;
+    return;
+  }
+
+  const items = allAgendamentos
+    .filter(a => a.data === selectedDateStr)
+    .sort((a, b) => (a.hora || '').localeCompare(b.hora || ''));
+
+  const [y, mo, d] = selectedDateStr.split('-');
+  const niceDate = `${d}/${mo}/${y}`;
+
+  if (!items.length) {
+    dayPanel.innerHTML = `
+      <h3>${niceDate}</h3>
+      <div class="day-sub">Nenhum horário marcado</div>
+      <div class="empty-state">Dia livre! ✨</div>`;
+    return;
+  }
+
+  dayPanel.innerHTML = `
+    <h3>${niceDate}</h3>
+    <div class="day-sub">${items.length} horário${items.length > 1 ? 's' : ''}</div>
+    <div class="agenda-list">
+      ${items.map(item => `
+        <div class="agenda-card" data-id="${item.id}">
+          <div class="agenda-avatar">${initials(item.nome)}</div>
+          <div class="agenda-info">
+            <div class="name">${item.nome ?? 'Sem nome'}</div>
+            <div class="meta">${item.email ?? ''} ${item.telefone ? '· ' + item.telefone : ''}</div>
+          </div>
+          <div class="agenda-when">
+            <div class="date">${item.hora ?? ''}</div>
+          </div>
+          <div class="agenda-actions">
+            <button class="icon-btn" data-action="delete" data-id="${item.id}">✕</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+calGrid.addEventListener('click', (e) => {
+  const cell = e.target.closest('.cal-day:not(.empty)');
+  if (!cell) return;
+  selectedDateStr = cell.dataset.date;
+  renderCalendar();
+  renderDayPanel();
+});
+
+document.getElementById('prevMonth').addEventListener('click', () => {
+  viewDate.setMonth(viewDate.getMonth() - 1);
+  renderCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+  viewDate.setMonth(viewDate.getMonth() + 1);
+  renderCalendar();
+});
+document.getElementById('todayBtn').addEventListener('click', () => {
+  viewDate = new Date();
+  renderCalendar();
+});
+
+refreshBtn.addEventListener('click', fetchAgendamentos);
+
+serviceForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  serviceMsg.className = 'form-msg';
+
+  const payload = {
+    nome: document.getElementById('serviceName').value.trim(),
+    descricao: document.getElementById('serviceDescription').value.trim(),
+    cor: document.getElementById('serviceColor').value,
+    duracao: Number(document.getElementById('serviceDuration').value),
+    preco: Number(document.getElementById('servicePrice').value),
+  };
+
+  serviceSubmitBtn.disabled = true;
+  serviceSubmitBtn.textContent = 'Cadastrando...';
+
+  try {
+    const res = await fetch(`${API_BASE}/novo_servico`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Erro ao cadastrar serviço');
+
+    serviceMsg.textContent = 'Serviço cadastrado com sucesso!';
+    serviceMsg.className = 'form-msg ok';
+    serviceForm.reset();
+    document.getElementById('serviceColor').value = '#C97B58';
+    fetchServicos();
+  } catch (err) {
+    serviceMsg.textContent = err.message;
+    serviceMsg.className = 'form-msg err';
+  } finally {
+    serviceSubmitBtn.disabled = false;
+    serviceSubmitBtn.textContent = 'Cadastrar serviço';
+  }
+});
+
+dayPanel.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+
+  if (btn.dataset.action === 'delete') {
+    const card = btn.closest('.agenda-card');
+    card.style.opacity = '0.4';
+    try {
+      const res = await fetch(`${API_BASE}/agendamentos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Erro ao deletar');
+      fetchAgendamentos();
+    } catch (err) {
+      card.style.opacity = '1';
+      alert('Erro ao deletar agendamento');
+    }
+  }
+});
+</script>
+</body>
+</html>

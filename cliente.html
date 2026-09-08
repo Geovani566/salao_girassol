@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Florescer · Studio de Unhas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3EA;
+    --blush:#E9C7B9;
+    --terracotta:#C97B58;
+    --plum:#4F2F3D;
+    --sage:#94A584;
+    --ink:#3A2C28;
+    --paper:#FFFCF8;
+    --line: rgba(79,47,61,0.14);
+    --radius-organic: 38% 62% 58% 42% / 48% 40% 60% 52%;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--cream);  
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3, .display{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+    color:var(--plum);
+    margin:0;
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    .blob{ animation: float 14s ease-in-out infinite; }
+    .blob.b2{ animation-duration:18s; animation-delay:-4s; }
+    .blob.b3{ animation-duration:22s; animation-delay:-9s; }
+    .reveal{
+      opacity:0;
+      transform: translateY(18px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+    .reveal.in{ opacity:1; transform:none; }
+  }
+  @keyframes float{
+    0%,100%{ transform: translate(0,0) rotate(0deg); }
+    33%{ transform: translate(10px,-16px) rotate(4deg); }
+    66%{ transform: translate(-12px,10px) rotate(-3deg); }
+  }
+
+  /* ---------- layout shells ---------- */
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+  section{ position:relative; padding:96px 0; }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background: rgba(251,243,234,0.86);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:30px; height:30px; border-radius:var(--radius-organic);
+    background: linear-gradient(135deg, var(--terracotta), var(--blush));
+    flex-shrink:0;
+  }
+  .logo-text{ font-family:'Fraunces', serif; font-size:21px; font-style:italic; color:var(--plum); }
+  .nav-links{ display:flex; gap:34px; align-items:center; }
+  .nav-links a{
+    color:var(--plum); text-decoration:none; font-size:14.5px; letter-spacing:.02em;
+    opacity:.78; transition:opacity .25s;
+  }
+  .nav-links a:hover{ opacity:1; }
+  .nav-cta{
+    background:var(--plum); color:var(--paper)!important; opacity:1!important;
+    padding:10px 20px; border-radius:30px; font-size:14px;
+  }
+  .nav-cta:hover{ background:var(--terracotta); }
+
+  /* ---------- hero ---------- */
+  .hero{ padding-top:74px; padding-bottom:60px; }
+  .hero .wrap{ position:relative; min-height:560px; display:flex; align-items:center; }
+  .blob{
+    position:absolute; z-index:0; filter:blur(.5px);
+  }
+  .b1{
+    width:480px; height:480px; right:-90px; top:-40px;
+    background: radial-gradient(circle at 30% 30%, #F0D7C9, var(--blush));
+    border-radius:63% 37% 41% 59% / 52% 47% 53% 48%;
+  }
+  .b2{
+    width:220px; height:220px; right:280px; top:340px;
+    background: radial-gradient(circle at 60% 40%, #B7C4A4, var(--sage));
+    border-radius:50% 50% 38% 62% / 60% 42% 58% 40%;
+    opacity:.65;
+  }
+  .b3{
+    width:130px; height:130px; right:60px; bottom:-30px;
+    background: var(--terracotta);
+    border-radius:var(--radius-organic);
+    opacity:.55;
+  }
+  .hero-content{ position:relative; z-index:2; max-width:600px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--terracotta); font-weight:600; margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:''; width:7px; height:7px; border-radius:50%;
+    background:var(--terracotta); display:inline-block;
+  }
+  .hero h1{
+    font-size:clamp(40px,5.2vw,64px);
+    line-height:1.04;
+  }
+  .hero h1 em{
+    font-style:italic; color:var(--terracotta); font-weight:500;
+  }
+  .hero p.lede{
+    font-size:18px; line-height:1.6; color:var(--plum); opacity:.82;
+    margin:22px 0 34px; max-width:460px;
+  }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    border:none; cursor:pointer; font-family:'Work Sans',sans-serif;
+    font-size:15px; font-weight:500; padding:15px 28px; border-radius:30px;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn-primary{
+    background:var(--plum); color:var(--paper);
+    box-shadow:0 10px 24px -8px rgba(79,47,61,.55);
+  }
+  .btn-primary:hover{ background:var(--terracotta); transform:translateY(-2px); }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+  .btn-ghost{
+    background:transparent; color:var(--plum); border:1.5px solid var(--line);
+  }
+  .btn-ghost:hover{ border-color:var(--terracotta); color:var(--terracotta); }
+
+  /* ---------- section heads ---------- */
+  .section-head{ max-width:560px; margin-bottom:52px; }
+  .section-tag{
+    font-size:13px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--sage); font-weight:600; display:block; margin-bottom:12px;
+  }
+  .section-head h2{ font-size:clamp(28px,3.4vw,40px); line-height:1.12; }
+  .section-head p{ color:var(--plum); opacity:.75; font-size:16px; line-height:1.6; margin-top:14px; }
+
+  /* ---------- services / signature swatches ---------- */
+  .swatches{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:18px;
+  }
+  .swatch{
+    background:var(--paper); border:1px solid var(--line); border-radius:24px;
+    padding:26px 22px; position:relative; overflow:hidden;
+    transition: transform .35s ease, box-shadow .35s ease;
+  }
+  .swatch:hover{ transform:translateY(-6px); box-shadow:0 20px 40px -22px rgba(79,47,61,.4); }
+  .swatch .dot{
+    width:42px; height:42px; border-radius:50% 50% 50% 12%;
+    margin-bottom:18px;
+  }
+  .swatch h3{ font-size:18px; margin-bottom:8px; }
+  .swatch p{ font-size:14px; color:var(--plum); opacity:.7; line-height:1.55; margin:0; }
+  .swatch .price{
+    margin-top:16px; font-family:'Fraunces',serif; font-style:italic; color:var(--terracotta); font-size:15px;
+  }
+
+  /* ---------- booking ---------- */
+  .booking{
+    background:var(--paper);
+    border-radius:44px;
+    border:1px solid var(--line);
+    overflow:hidden;
+  }
+  .booking-grid{ display:grid; grid-template-columns:1.05fr 1fr; }
+  .booking-art{
+    background: linear-gradient(160deg, var(--plum), #3a2230);
+    position:relative; padding:52px; display:flex; flex-direction:column; justify-content:space-between;
+    color:var(--cream); overflow:hidden;
+  }
+  .booking-art .blob{ opacity:.5; }
+  .booking-art .ba1{ width:260px; height:260px; background:var(--terracotta); right:-80px; top:-60px; border-radius:50% 50% 40% 60% / 55% 45% 55% 45%; }
+  .booking-art .ba2{ width:160px; height:160px; background:var(--sage); left:-50px; bottom:40px; border-radius:60% 40% 50% 50% / 45% 55% 45% 55%; opacity:.35; }
+  .booking-art-top{ position:relative; z-index:2; }
+  .booking-art h3{ color:var(--cream); font-size:30px; line-height:1.15; max-width:300px; }
+  .booking-art p{ color:var(--blush); opacity:.85; font-size:14.5px; line-height:1.6; margin-top:14px; max-width:280px; }
+  .hours-list{ position:relative; z-index:2; list-style:none; padding:0; margin:0; font-size:14px; }
+  .hours-list li{ display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid rgba(251,243,234,.16); color:var(--cream); opacity:.85; }
+  .hours-list li:first-child{ border-top:none; }
+
+  .booking-form{ padding:52px; }
+  .form-row{ margin-bottom:20px; }
+  .form-row label{
+    display:block; font-size:13px; letter-spacing:.04em; color:var(--plum);
+    margin-bottom:8px; font-weight:500;
+  }
+  .form-row input{
+    width:100%; padding:13px 16px; border:1.5px solid var(--line); border-radius:14px;
+    background:var(--cream); font-family:'Work Sans',sans-serif; font-size:15px; color:var(--ink);
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .form-row input:focus{
+    outline:none; border-color:var(--terracotta); background:var(--paper);
+  }
+  .form-row-pair{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-msg{
+    font-size:13.5px; padding:12px 14px; border-radius:12px; margin-top:6px; display:none;
+  }
+  .form-msg.ok{ display:block; background:#EAF1E3; color:#4C6B3A; }
+  .form-msg.err{ display:block; background:#F6E3DC; color:#9C4A2E; }
+  .form-hint{
+    font-size:12.5px; color:var(--plum); opacity:.6; margin-top:6px;
+  }
+  .submit-row{ margin-top:28px; display:flex; align-items:center; gap:16px; }
+
+  footer{
+    border-top:1px solid var(--line); padding:40px 0; text-align:center;
+    color:var(--plum); opacity:.6; font-size:13.5px;
+  }
+
+  @media (max-width: 900px){
+    .booking-grid{ grid-template-columns:1fr; }
+    .swatches{ grid-template-columns:repeat(2,1fr); }
+    .form-row-pair{ grid-template-columns:1fr; }
+    .nav-links a:not(.nav-cta){ display:none; }
+  }
+  @media (max-width: 560px){
+    .wrap{ padding:0 18px; }
+    section{ padding:64px 0; }
+    .swatches{ grid-template-columns:1fr 1fr; }
+    .booking-form, .booking-art{ padding:32px; }
+  }
+
+  :focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+  .form-row select{
+  width:100%;
+  padding:13px 40px 13px 16px;
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  background:var(--cream);
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  color:var(--ink);
+
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%234F2F3D' d='M7 10l5 5l5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+}
+.form-row select:focus{
+  outline:none;
+  border-color:var(--terracotta);
+  background:var(--paper);
+}
+.form-row select:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+</style>
+</head>
+<body>
+
+<div class="conn-banner" id="connBanner" style="display:none; background:#F6E3DC; color:#9C4A2E; font-size:14px; padding:12px 32px; text-align:center;">
+  Não consegui falar com a API em <code id="apiUrlShown"></code> · veja o rodapé para configurar o endereço
+</div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">Florescer</span>
+    </div>
+    <div class="nav-links">
+      <a href="#servicos">Serviços</a>
+      <a href="#agendar">Agendar</a>
+      <a href="#agendar" class="nav-cta">Marcar horário</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="hero-content reveal">
+      <span class="eyebrow">Studio de manicure &amp; nail art</span>
+      <h1>Mãos que contam <em>histórias</em>, unhas que florescem.</h1>
+      <p class="lede">Agende seu horário em poucos cliques. Cuidado artesanal, esmaltes selecionados e um cantinho calmo só seu.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('agendar').scrollIntoView()">Marcar horário</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('servicos').scrollIntoView()">Ver serviços</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="servicos">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-tag">Serviços</span>
+      <h2>Cada esmalte, um cuidado.</h2>
+      <p>Escolha o que combina com o seu momento — todos os atendimentos incluem preparo das cutículas e hidratação.</p>
+    </div>
+    <div class="swatches" id="swatchesContainer">
+  <!-- preenchido via JS -->
+    </div>
+  </div>
+</section>
+
+<section id="agendar">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-tag">Agendamento</span>
+      <h2>Reserve seu momento de cuidado.</h2>
+      <p>Preencha os dados abaixo — confirmamos por e-mail ou telefone antes do seu horário.</p>
+    </div>
+
+    <div class="booking reveal">
+      <div class="booking-grid">
+        <div class="booking-art">
+          <div class="blob ba1"></div>
+          <div class="blob ba2"></div>
+          <div class="booking-art-top">
+            <h3>Seu horário, do seu jeito.</h3>
+            <p>Escolha o dia e a hora que funcionam para você. Respondemos rápido para confirmar.</p>
+          </div>
+          <ul class="hours-list">
+            <li><span>Segunda – Sábado</span><span>9h às 19h</span></li>
+            <li><span>Domingo</span><span>Fechado</span></li>
+          </ul>
+        </div>
+        <form class="booking-form" id="bookingForm">
+          <div class="form-row">
+            <label for="nome">Nome completo</label>
+            <input id="nome" name="nome" type="text" placeholder="Como podemos te chamar?" required>
+          </div>
+          <div class="form-row">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" name="telefone" type="tel" placeholder="(48) 99999-0000" required>
+          </div>
+          <div class="form-row">
+            <label for="servico">Serviço</label>
+            <select id="servico" name="servico" required>
+              <option value="">Selecione um serviço</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="data">Data</label>
+            <input id="data" name="data" type="date" required>
+          </div>
+          <div class="form-row">
+            <label for="hora">Horário</label>
+            <select id="hora" name="hora" required disabled>
+              <option value="">Escolha o serviço e a data primeiro</option>
+            </select>
+            <div class="form-hint" id="horaHint"></div>
+          </div>
+          <div class="submit-row">
+            <button class="btn btn-primary" type="submit" id="submitBtn">Confirmar agendamento</button>
+          </div>
+          <div class="form-msg" id="formMsg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Florescer Studio · API em <code id="apiBase">http://127.0.0.1:8000</code> ·
+    <span id="footerNote">edite a constante API_BASE no código para apontar para o seu servidor</span>
+  </div>
+</footer>
+<script>
+// -----------------------------------------------------------------
+// Aponte para o endereço onde sua API FastAPI está rodando.
+const API_BASE = "http://127.0.0.1:8000";
+// -----------------------------------------------------------------
+
+document.getElementById('apiUrlShown').textContent = API_BASE;
+document.getElementById('apiBase').textContent = API_BASE;
+
+const connBanner = document.getElementById('connBanner');
+const formMsg = document.getElementById('formMsg');
+const bookingForm = document.getElementById('bookingForm');
+const submitBtn = document.getElementById('submitBtn');
+
+const servicoSelect = document.getElementById('servico');
+const dataInput = document.getElementById('data');
+const horaSelect = document.getElementById('hora');
+const horaHint = document.getElementById('horaHint');
+
+function showConnError(show){ connBanner.style.display = show ? 'block' : 'none'; }
+
+async function carregarServicos(){
+  try{
+    const res = await fetch(`${API_BASE}/mostrar_servicos`);
+    if(!res.ok) throw new Error('status ' + res.status);
+    const servicos = await res.json();
+
+    const container = document.getElementById('swatchesContainer');
+
+    container.innerHTML = '';
+    servicoSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+    if(servicos.length === 0){
+      container.innerHTML = '<p class="section-text">Nenhum serviço cadastrado ainda.</p>';
+      return;
+    }
+    servicos.forEach(servico => {
+      const card = document.createElement('div');
+      card.className = 'swatch reveal in';
+      card.innerHTML = `
+        <div class="dot" style="background:${servico.cor || '#C97B58'};"></div>
+        <h3>${servico.nome}</h3>
+        <p>${servico.descricao}</p>
+        <div class="price">a partir de R$ ${Number(servico.preco).toFixed(2)}</div>
+      `;
+      container.appendChild(card);
+
+      const option = document.createElement('option');
+      option.value = servico.nome;
+      option.textContent = servico.nome;
+      servicoSelect.appendChild(option);
+    });
+  }catch(err){
+    showConnError(true);
+  }
+}
+
+function resetHoraSelect(mensagem){
+  horaSelect.innerHTML = `<option value="">${mensagem}</option>`;
+  horaSelect.disabled = true;
+  horaHint.textContent = '';
+}
+
+async function carregarHorariosDisponiveis(){
+  const servico = servicoSelect.value;
+  const data = dataInput.value;
+
+  if(!servico || !data){
+    resetHoraSelect('Escolha o serviço e a data primeiro');
+    return;
+  }
+
+  resetHoraSelect('Carregando horários...');
+
+  try{
+    const url = `${API_BASE}/horarios_disponiveis?data=${encodeURIComponent(data)}&servico=${encodeURIComponent(servico)}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('status ' + res.status);
+    const json = await res.json();
+    const horarios = json.horarios || [];
+
+    if(horarios.length === 0){
+      resetHoraSelect('Nenhum horário disponível nesse dia');
+      horaHint.textContent = 'Tente escolher outra data para esse serviço.';
+      return;
+    }
+
+    horaSelect.innerHTML = '<option value="">Selecione um horário</option>';
+    horarios.forEach(hora => {
+      const option = document.createElement('option');
+      option.value = hora;
+      option.textContent = hora;
+      horaSelect.appendChild(option);
+    });
+    horaSelect.disabled = false;
+    horaHint.textContent = `${horarios.length} horário(s) disponível(is) nesse dia.`;
+    showConnError(false);
+  }catch(err){
+    resetHoraSelect('Não foi possível carregar os horários');
+    showConnError(true);
+  }
+}
+
+servicoSelect.addEventListener('change', carregarHorariosDisponiveis);
+dataInput.addEventListener('change', carregarHorariosDisponiveis);
+
+carregarServicos();
+resetHoraSelect('Escolha o serviço e a data primeiro');
+
+bookingForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  formMsg.className = 'form-msg';
+  const payload = {
+    nome: document.getElementById('nome').value.trim(),
+    telefone: document.getElementById('telefone').value.trim(),
+    servico: servicoSelect.value.trim(),
+    data: dataInput.value,
+    hora: horaSelect.value,
+  };
+
+  if(!payload.hora){
+    formMsg.textContent = 'Escolha um horário disponível antes de confirmar.';
+    formMsg.className = 'form-msg err';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Confirmando...';
+  try{
+    const res = await fetch(`${API_BASE}/criar_agendamento`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if(res.status === 409){
+      const erro = await res.json().catch(() => ({}));
+      formMsg.textContent = erro.detail || 'Esse horário acabou de ficar indisponível. Escolha outro.';
+      formMsg.className = 'form-msg err';
+      await carregarHorariosDisponiveis();
+      return;
+    }
+    if(!res.ok) throw new Error('status ' + res.status);
+
+    showConnError(false);
+    formMsg.textContent = 'Agendamento confirmado! Te esperamos no studio. 🌸';
+    formMsg.className = 'form-msg ok';
+    bookingForm.reset();
+    resetHoraSelect('Escolha o serviço e a data primeiro');
+  }catch(err){
+    showConnError(true);
+    formMsg.textContent = `Não foi possível confirmar agora. Verifique se a API está rodando em ${API_BASE}.`;
+    formMsg.className = 'form-msg err';
+  }finally{
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Confirmar agendamento';
+  }
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('in'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
