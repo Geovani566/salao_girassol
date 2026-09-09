@@ -1,8 +1,44 @@
-from fastapi import FastAPI, HTTPException
+import os
+from pathlib import Path
+
+from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, EmailStr
 from crud_api import CrudApi
 from database import inicializar_banco
 from fastapi.middleware.cors import CORSMiddleware
+
+
+def load_local_env():
+    """Carrega o arquivo .env local sem sobrescrever variaveis do Render."""
+    env_file = Path(__file__).with_name(".env")
+    if not env_file.exists():
+        return
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, value = line.split("=", 1)
+        os.environ.setdefault(name.strip(), value.strip())
+
+
+def required_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"A variavel de ambiente {name} precisa ser configurada.")
+    return value
+
+
+load_local_env()
+ADMIN_EMAIL = required_env("ADMIN_EMAIL")
+ADMIN_PASSWORD = required_env("ADMIN_PASSWORD")
+ADMIN_TOKEN = required_env("ADMIN_TOKEN")
+
+
+def require_admin(authorization: str | None = Header(default=None)):
+    if authorization != f"Bearer {ADMIN_TOKEN}":
+        raise HTTPException(status_code=401, detail="Nao autorizado")
+
+
 app = FastAPI()
 inicializar_banco()
 app.add_middleware(
@@ -48,11 +84,11 @@ def home():
     return {"status": "API ESTÁ RODANDO!"}
 
 @app.get("/agendamentos")
-def listar_agendamentos():
+def listar_agendamentos(_admin: None = Depends(require_admin)):
     return crud.listar_agendamentos()
 
 @app.get("/agendamentos/{id}")
-def buscar_agendamento(id: int):
+def buscar_agendamento(id: int, _admin: None = Depends(require_admin)):
     resultado = crud.buscar_agendamento(id)
     if resultado is None:
         raise HTTPException(status_code=404, detail="Agendamento não encontrado")
@@ -73,13 +109,13 @@ def criar_novo_agendamento(agendamento: Agendamento):
     return {"status": "Agendamento criado com sucesso!"}
 
 @app.put("/agendamentos/{id}")
-def editar_agendamento(id: int, agendamento: AgendamentoUpdate):
+def editar_agendamento(id: int, agendamento: AgendamentoUpdate, _admin: None = Depends(require_admin)):
     if crud.buscar_agendamento(id) is None:
         raise HTTPException(status_code=404, detail="Agendamento não encontrado")
     return crud.editar_agendamento(id, agendamento.nome)
 
 @app.delete("/agendamentos/{id}")
-def deletar_agendamento(id: int):
+def deletar_agendamento(id: int, _admin: None = Depends(require_admin)):
     if crud.buscar_agendamento(id) is None:
         raise HTTPException(status_code=404, detail="Agendamento não encontrado")
     crud.deletar_agendamento(id)
@@ -88,10 +124,10 @@ def deletar_agendamento(id: int):
 @app.post("/admin/login")
 def login(dados:login):
     if (
-        dados.email == "teste@123"
-        and dados.senha =="123"
+        dados.email == ADMIN_EMAIL
+        and dados.senha == ADMIN_PASSWORD
     ): 
-        return {"access_token":"token_teste"}
+        return {"access_token": ADMIN_TOKEN}
     raise HTTPException(
         status_code=401,
         detail= "Credenciais inválidas"
@@ -102,7 +138,7 @@ def mostrar_servicos():
 
 
 @app.post("/novo_servico")
-def criar_novo_servico(servico: novo_servico):
+def criar_novo_servico(servico: novo_servico, _admin: None = Depends(require_admin)):
     novo_id = crud.criar_servico(
         servico.nome,
         servico.descricao,
@@ -113,11 +149,11 @@ def criar_novo_servico(servico: novo_servico):
     return {"status": "Serviço criado com sucesso!", "id": novo_id}
 
 @app.get("/horarios_trabalho")
-def listar_horarios_trabalho():
+def listar_horarios_trabalho(_admin: None = Depends(require_admin)):
     return crud.listar_horarios_trabalho()
 
 @app.post("/horarios_trabalho")
-def salvar_horarios_trabalho(horarios: list[HorarioTrabalho]):
+def salvar_horarios_trabalho(horarios: list[HorarioTrabalho], _admin: None = Depends(require_admin)):
     return crud.salvar_horarios_trabalho([horario.model_dump() for horario in horarios])
 
 @app.get("/horarios_disponiveis")
