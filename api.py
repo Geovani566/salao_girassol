@@ -1,8 +1,10 @@
 import os
+import re
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from crud_api import CrudApi
 from database import inicializar_banco
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,7 +53,6 @@ crud = CrudApi()
 class novo_servico(BaseModel):
     nome:str
     descricao:str
-    cor:str
     duracao:float
     preco:float
 
@@ -70,14 +71,38 @@ class Agendamento(BaseModel):
     hora: str
 
 class AgendamentoUpdate(BaseModel):
-    nome: str
+    data: str
+    hora: str
+
+    @field_validator("data")
+    @classmethod
+    def validar_data(cls, valor: str) -> str:
+        try:
+            datetime.strptime(valor, "%Y-%m-%d")
+        except ValueError as erro:
+            raise ValueError("A data deve estar no formato AAAA-MM-DD") from erro
+        return valor
+
+    @field_validator("hora")
+    @classmethod
+    def validar_hora(cls, valor: str) -> str:
+        if not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", valor):
+            raise ValueError("O horário deve estar no formato HH:MM")
+        return valor
 
 class HorarioTrabalho(BaseModel):
-    dia_semana: int
+    dia_semana: int = Field(ge=0, le=6)
     ativo: bool
     hora_inicio: str
     hora_fim: str
-    intervalo: int
+    intervalo: int = Field(ge=1, le=240)
+
+    @field_validator("hora_inicio", "hora_fim")
+    @classmethod
+    def validar_hora(cls, valor: str) -> str:
+        if not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", valor):
+            raise ValueError("O horário deve estar no formato HH:MM")
+        return valor
 
 @app.get("/")
 def home():
@@ -110,9 +135,16 @@ def criar_novo_agendamento(agendamento: Agendamento):
 
 @app.put("/agendamentos/{id}")
 def editar_agendamento(id: int, agendamento: AgendamentoUpdate, _admin: None = Depends(require_admin)):
-    if crud.buscar_agendamento(id) is None:
+    existente = crud.buscar_agendamento(id)
+    if existente is None:
         raise HTTPException(status_code=404, detail="Agendamento não encontrado")
-    return crud.editar_agendamento(id, agendamento.nome)
+    if agendamento.data == existente["data"] and agendamento.hora == existente["hora"]:
+        return crud.editar_agendamento(id, agendamento.data, agendamento.hora)
+    if not crud.horario_esta_disponivel(
+        agendamento.data, existente["servico"], agendamento.hora, id
+    ):
+        raise HTTPException(status_code=409, detail="Horário indisponível para este serviço")
+    return crud.editar_agendamento(id, agendamento.data, agendamento.hora)
 
 @app.delete("/agendamentos/{id}")
 def deletar_agendamento(id: int, _admin: None = Depends(require_admin)):
@@ -142,7 +174,6 @@ def criar_novo_servico(servico: novo_servico, _admin: None = Depends(require_adm
     novo_id = crud.criar_servico(
         servico.nome,
         servico.descricao,
-        servico.cor,
         servico.duracao,
         servico.preco,
     )
@@ -154,8 +185,26 @@ def listar_horarios_trabalho(_admin: None = Depends(require_admin)):
 
 @app.post("/horarios_trabalho")
 def salvar_horarios_trabalho(horarios: list[HorarioTrabalho], _admin: None = Depends(require_admin)):
+    dias = [horario.dia_semana for horario in horarios]
+    if len(horarios) != 7 or sorted(dias) != list(range(7)):
+        raise HTTPException(
+            status_code=422,
+            detail="Envie exatamente uma configuração para cada dia da semana.",
+        )
+    for horario in horarios:
+        if horario.ativo and horario.hora_inicio >= horario.hora_fim:
+            raise HTTPException(
+                status_code=422,
+                detail="O horário de início deve ser anterior ao horário de fim.",
+            )
     return crud.salvar_horarios_trabalho([horario.model_dump() for horario in horarios])
 
 @app.get("/horarios_disponiveis")
-def listar_horarios_disponiveis(data: str, servico: str):
-    return {"horarios": crud.listar_horarios_disponiveis(data, servico)}
+def listar_horarios_disponiveis(
+    data: str, servico: str, excluir_agendamento_id: int | None = None
+):
+    return {
+        "horarios": crud.listar_horarios_disponiveis(
+            data, servico, excluir_agendamento_id
+        )
+    }

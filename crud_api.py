@@ -1,7 +1,11 @@
 # aqui eu vou fazer o crud do agendamento.
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from database import fazer_conexao
+
+
+# O Brasil não utiliza horário de verão; UTC-3 corresponde ao horário de Brasília.
+FUSO_HORARIO = timezone(timedelta(hours=-3))
 
 
 def _time_to_minutes(value):
@@ -97,15 +101,15 @@ class CrudApi:
             conexao.close()
 
     @staticmethod
-    def editar_agendamento(_id, _nome):
+    def editar_agendamento(_id, _data, _hora):
         conexao = fazer_conexao()
         try:
             cursor = conexao.cursor()
             cursor.execute("""
                 UPDATE agendamento
-                SET nome = ?
+                SET data = ?, hora = ?
                 WHERE id = ?
-            """, (_nome, _id))
+            """, (_data, _hora, _id))
             conexao.commit()
         finally:
             conexao.close()
@@ -116,16 +120,15 @@ class CrudApi:
         conn = fazer_conexao()
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, nome, descricao, cor, duracao, preco FROM servicos")
+            cursor.execute("SELECT id, nome, descricao, duracao, preco FROM servicos")
             servicos = cursor.fetchall()
             return [
                 {
                     "id": servico[0],
                     "nome": servico[1],
-                    "descricao": servico[2],
-                    "cor": servico[3],
-                    "duracao": servico[4],
-                    "preco": servico[5],
+                    "descricao": servico[2],                  
+                    "duracao": servico[3],
+                    "preco": servico[4],
                 }
                 for servico in servicos
             ]
@@ -133,14 +136,14 @@ class CrudApi:
             conn.close()
 
     @staticmethod
-    def criar_servico(nome, descricao, cor, duracao, preco):
+    def criar_servico(nome, descricao, duracao, preco):
         conn = fazer_conexao()
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO servicos(nome,descricao,cor,duracao,preco)
-                VALUES(?,?,?,?,?)
-            """, (nome, descricao, cor, duracao, preco))
+                INSERT INTO servicos(nome, descricao, duracao, preco)
+                VALUES(?, ?, ?, ?)
+            """, (nome, descricao, duracao, preco))
             conn.commit()
             return cursor.lastrowid
         finally:
@@ -207,7 +210,16 @@ class CrudApi:
             conn.close()
 
     @staticmethod
-    def listar_horarios_disponiveis(data, servico):
+    def listar_horarios_disponiveis(data, servico, excluir_agendamento_id=None):
+        try:
+            data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            return []
+
+        agora = datetime.now(FUSO_HORARIO)
+        if data_agendamento < agora.date():
+            return []
+
         duracao = CrudApi.buscar_duracao_servico(servico)
         if duracao is None:
             return []
@@ -232,14 +244,15 @@ class CrudApi:
                 return []
 
             cursor.execute("""
-                SELECT a.hora, COALESCE(s.duracao, 30)
+                SELECT a.id, a.hora, COALESCE(s.duracao, 30)
                 FROM agendamento a
                 LEFT JOIN servicos s ON s.nome = a.servico
                 WHERE a.data = ?
             """, (data,))
             ocupados = [
-                (_time_to_minutes(row[0]), _time_to_minutes(row[0]) + int(row[1]))
+                (_time_to_minutes(row[1]), _time_to_minutes(row[1]) + int(row[2]))
                 for row in cursor.fetchall()
+                if row[0] != excluir_agendamento_id
             ]
 
             horarios = []
@@ -251,7 +264,13 @@ class CrudApi:
                     for ocupado_inicio, ocupado_fim in ocupados
                 )
                 if not tem_colisao:
-                    horarios.append(_minutes_to_time(candidato))
+                    horario_candidato = _minutes_to_time(candidato)
+                    horario_passou = (
+                        data_agendamento == agora.date()
+                        and candidato <= agora.hour * 60 + agora.minute
+                    )
+                    if not horario_passou:
+                        horarios.append(horario_candidato)
                 candidato += intervalo
 
             return horarios
@@ -259,5 +278,7 @@ class CrudApi:
             conn.close()
 
     @staticmethod
-    def horario_esta_disponivel(data, servico, hora):
-        return hora in CrudApi.listar_horarios_disponiveis(data, servico)
+    def horario_esta_disponivel(data, servico, hora, excluir_agendamento_id=None):
+        return hora in CrudApi.listar_horarios_disponiveis(
+            data, servico, excluir_agendamento_id
+        )

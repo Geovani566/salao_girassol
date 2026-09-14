@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Florescer · Studio de Unhas</title>
@@ -23,7 +25,7 @@
   html{ scroll-behavior:smooth; }
   body{
     margin:0;
-    background:var(--cream);  
+    background:var(--cream);
     color:var(--ink);
     font-family:'Work Sans', sans-serif;
     font-weight:400;
@@ -39,6 +41,9 @@
     margin:0;
   }
 
+  a{ text-decoration:none; color:inherit; }
+
+  /* ---------- animações (priorizadas) ---------- */
   @media (prefers-reduced-motion:no-preference){
     .blob{ animation: float 14s ease-in-out infinite; }
     .blob.b2{ animation-duration:18s; animation-delay:-4s; }
@@ -56,7 +61,7 @@
     66%{ transform: translate(-12px,10px) rotate(-3deg); }
   }
 
-  /* ---------- layout shells ---------- */
+  /* ---------- layout base ---------- */
   .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
   section{ position:relative; padding:96px 0; }
 
@@ -77,7 +82,7 @@
   .logo-text{ font-family:'Fraunces', serif; font-size:21px; font-style:italic; color:var(--plum); }
   .nav-links{ display:flex; gap:34px; align-items:center; }
   .nav-links a{
-    color:var(--plum); text-decoration:none; font-size:14.5px; letter-spacing:.02em;
+    color:var(--plum); font-size:14.5px; letter-spacing:.02em;
     opacity:.78; transition:opacity .25s;
   }
   .nav-links a:hover{ opacity:1; }
@@ -90,9 +95,7 @@
   /* ---------- hero ---------- */
   .hero{ padding-top:74px; padding-bottom:60px; }
   .hero .wrap{ position:relative; min-height:560px; display:flex; align-items:center; }
-  .blob{
-    position:absolute; z-index:0; filter:blur(.5px);
-  }
+  .blob{ position:absolute; z-index:0; filter:blur(.5px); }
   .b1{
     width:480px; height:480px; right:-90px; top:-40px;
     background: radial-gradient(circle at 30% 30%, #F0D7C9, var(--blush));
@@ -120,13 +123,8 @@
     content:''; width:7px; height:7px; border-radius:50%;
     background:var(--terracotta); display:inline-block;
   }
-  .hero h1{
-    font-size:clamp(40px,5.2vw,64px);
-    line-height:1.04;
-  }
-  .hero h1 em{
-    font-style:italic; color:var(--terracotta); font-weight:500;
-  }
+  .hero h1{ font-size:clamp(40px,5.2vw,64px); line-height:1.04; }
+  .hero h1 em{ font-style:italic; color:var(--terracotta); font-weight:500; }
   .hero p.lede{
     font-size:18px; line-height:1.6; color:var(--plum); opacity:.82;
     margin:22px 0 34px; max-width:460px;
@@ -143,9 +141,7 @@
   }
   .btn-primary:hover{ background:var(--terracotta); transform:translateY(-2px); }
   .btn-primary:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
-  .btn-ghost{
-    background:transparent; color:var(--plum); border:1.5px solid var(--line);
-  }
+  .btn-ghost{ background:transparent; color:var(--plum); border:1.5px solid var(--line); }
   .btn-ghost:hover{ border-color:var(--terracotta); color:var(--terracotta); }
 
   /* ---------- section heads ---------- */
@@ -157,33 +153,60 @@
   .section-head h2{ font-size:clamp(28px,3.4vw,40px); line-height:1.12; }
   .section-head p{ color:var(--plum); opacity:.75; font-size:16px; line-height:1.6; margin-top:14px; }
 
-  /* ---------- services / signature swatches ---------- */
-  .swatches{
-    display:grid; grid-template-columns:repeat(4,1fr); gap:18px;
-  }
+  /* ---------- serviços (swatches) ---------- */
+  .swatches{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
   .swatch{
     background:var(--paper); border:1px solid var(--line); border-radius:24px;
     padding:26px 22px; position:relative; overflow:hidden;
     transition: transform .35s ease, box-shadow .35s ease;
   }
   .swatch:hover{ transform:translateY(-6px); box-shadow:0 20px 40px -22px rgba(79,47,61,.4); }
-  .swatch .dot{
-    width:42px; height:42px; border-radius:50% 50% 50% 12%;
-    margin-bottom:18px;
-  }
+  .swatch .dot{ width:42px; height:42px; border-radius:50% 50% 50% 12%; margin-bottom:18px; }
   .swatch h3{ font-size:18px; margin-bottom:8px; }
   .swatch p{ font-size:14px; color:var(--plum); opacity:.7; line-height:1.55; margin:0; }
   .swatch .price{
     margin-top:16px; font-family:'Fraunces',serif; font-style:italic; color:var(--terracotta); font-size:15px;
   }
+  .section-text{ color:var(--plum); opacity:.7; font-size:15px; }
+
+  /* ---------- quem somos ---------- */
+  .quem-somos{ background:var(--plum); }
+  .quem-somos .section-tag{ color:var(--blush); }
+  .quem-somos .section-head h2{ color:var(--cream); }
+  .quem-somos .section-head p{ color:var(--cream); opacity:.68; }
+  .cards-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+  .card{
+    background:rgba(251,243,234,.06); border:1px solid rgba(251,243,234,.14);
+    border-radius:22px; padding:30px 26px; transition: background .3s ease, transform .3s ease;
+  }
+  .card:hover{ background:rgba(251,243,234,.11); transform:translateY(-4px); }
+  .card-icon{
+    width:45px; height:45px; border-radius:50% 50% 50% 50%;
+    background: linear-gradient(135deg, var(--terracotta), var(--blush));
+    margin-bottom:18px; display:flex; align-items:center; justify-content:center;
+    font-size:19px;
+  }
+  .card h3{ color:var(--cream); font-size:17px; margin-bottom:8px; }
+  .card p{ color:var(--cream); opacity:.62; font-size:14px; line-height:1.6; margin:0; }
+
+  /* ---------- Instagram ---------- */
+  .insta{ background:var(--blush); }
+  .insta-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:32px; max-width:520px;
+  }
+  .insta-placeholder{ aspect-ratio:1; border-radius:16px; overflow:hidden; transition:transform .3s ease; }
+  .insta-placeholder:hover{ transform:scale(1.04); }
+  .insta-placeholder svg{ width:100%; height:100%; display:block; }
+  .btn-instagram{
+    display:inline-flex; align-items:center; gap:.55rem;
+    background:var(--plum); color:var(--paper);
+    padding:.85rem 1.8rem; border-radius:999px; font-size:.92rem; font-weight:500;
+    transition:background .2s ease;
+  }
+  .btn-instagram:hover{ background:var(--terracotta); }
 
   /* ---------- booking ---------- */
-  .booking{
-    background:var(--paper);
-    border-radius:44px;
-    border:1px solid var(--line);
-    overflow:hidden;
-  }
+  .booking{ background:var(--paper); border-radius:44px; border:1px solid var(--line); overflow:hidden; }
   .booking-grid{ display:grid; grid-template-columns:1.05fr 1fr; }
   .booking-art{
     background: linear-gradient(160deg, var(--plum), #3a2230);
@@ -211,19 +234,36 @@
     background:var(--cream); font-family:'Work Sans',sans-serif; font-size:15px; color:var(--ink);
     transition:border-color .2s ease, background .2s ease;
   }
-  .form-row input:focus{
-    outline:none; border-color:var(--terracotta); background:var(--paper);
+  .form-row input:focus{ outline:none; border-color:var(--terracotta); background:var(--paper); }
+  .form-row select{
+    width:100%; padding:13px 40px 13px 16px; border:1.5px solid var(--line); border-radius:14px;
+    background:var(--cream); font-family:'Work Sans',sans-serif; font-size:15px; color:var(--ink);
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%234F2F3D' d='M7 10l5 5l5-5z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center;
+    transition:border-color .2s ease, background-color .2s ease;
   }
+  .form-row select:focus{ outline:none; border-color:var(--terracotta); background-color:var(--paper); }
+  .form-row select:disabled{ opacity:.55; cursor:not-allowed; }
   .form-row-pair{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .form-msg{
-    font-size:13.5px; padding:12px 14px; border-radius:12px; margin-top:6px; display:none;
-  }
+  .form-msg{ font-size:13.5px; padding:12px 14px; border-radius:12px; margin-top:6px; display:none; }
   .form-msg.ok{ display:block; background:#EAF1E3; color:#4C6B3A; }
   .form-msg.err{ display:block; background:#F6E3DC; color:#9C4A2E; }
-  .form-hint{
-    font-size:12.5px; color:var(--plum); opacity:.6; margin-top:6px;
+  .form-hint{ font-size:12.5px; color:var(--plum); opacity:.6; margin-top:6px; }
+  .submit-row{ margin-top:28px; display:flex; align-items:center; justify-content:center; gap:16px; }
+  .link-whats{
+    display:flex; align-items:center; justify-content:center; gap:.5rem;
+    margin:1.1rem auto 0; width:max-content;
+    color:#3F5C39; font-size:.9rem; font-weight:500;
+    background:#E3EBDC; padding:12px 22px; border-radius:30px;
+    transition: background .2s ease;
   }
-  .submit-row{ margin-top:28px; display:flex; align-items:center; gap:16px; }
+  .link-whats:hover{ background:#D7E3CC; }
+
+  .conn-banner{
+    display:none; background:#F6E3DC; color:#9C4A2E; font-size:14px;
+    padding:12px 32px; text-align:center;
+  }
 
   footer{
     border-top:1px solid var(--line); padding:40px 0; text-align:center;
@@ -241,41 +281,60 @@
     section{ padding:64px 0; }
     .swatches{ grid-template-columns:1fr 1fr; }
     .booking-form, .booking-art{ padding:32px; }
+    .insta-grid{ max-width:100%; }
   }
 
   :focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
-  .form-row select{
-  width:100%;
-  padding:13px 40px 13px 16px;
-  border:1.5px solid var(--line);
-  border-radius:14px;
-  background:var(--cream);
-  font-family:'Work Sans',sans-serif;
-  font-size:15px;
-  color:var(--ink);
-
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%234F2F3D' d='M7 10l5 5l5-5z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 14px center;
+.site-footer {
+    margin-top: 80px;
+    padding: 65px 20px 25px;
+    background: #f8f3f1;
+    border-top: 1px solid rgba(100, 70, 70, 0.10);
 }
-.form-row select:focus{
-  outline:none;
-  border-color:var(--terracotta);
-  background:var(--paper);
+
+.footer-wrap {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+    text-align: center;
 }
-.form-row select:disabled{
-  opacity:.55;
-  cursor:not-allowed;
+
+.footer-main {
+    display: flex;
+    justify-content: center;
+}
+
+.footer-brand {
+    text-align: center;
+}
+
+.footer-tag {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    opacity: 0.65;
+}
+
+.footer-brand h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+}
+
+.footer-brand p {
+    max-width: 280px;
+    margin: 12px auto 0;
+    font-size: 14px;
+    line-height: 1.7;
+    opacity: 0.65;
 }
 </style>
 </head>
+
 <body>
 
-<div class="conn-banner" id="connBanner" style="display:none; background:#F6E3DC; color:#9C4A2E; font-size:14px; padding:12px 32px; text-align:center;">
+<div class="conn-banner" id="connBanner">
   Não consegui falar com a API em <code id="apiUrlShown"></code> · veja o rodapé para configurar o endereço
 </div>
 
@@ -286,14 +345,15 @@
       <span class="logo-text">Florescer</span>
     </div>
     <div class="nav-links">
+      <a href="#inicio">Início</a>
+      <a href="#quem-somos">Quem somos</a>
       <a href="#servicos">Serviços</a>
-      <a href="#agendar">Agendar</a>
-      <a href="#agendar" class="nav-cta">Marcar horário</a>
+      <a href="#agendar" class="nav-cta">Agendar</a>
     </div>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" id="inicio">
   <div class="wrap">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -310,15 +370,92 @@
   </div>
 </header>
 
+<section class="quem-somos" id="quem-somos">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-tag">Quem somos</span>
+      <h2>Cuidado de verdade, em cada detalhe.</h2>
+      <p>Mais que um serviço, um momento pra você respirar. Trabalhamos com técnica, produtos de qualidade e muito carinho em cada atendimento.</p>
+    </div>
+    <div class="cards-grid reveal">
+      <div class="card">
+        <div class="card-icon">✦</div>
+        <h3>Cuidado artesanal</h3>
+        <p>Cada atendimento é feito com atenção aos detalhes, no seu ritmo.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fa-solid fa-bottle-droplet"></i></div>
+        <h3>Produtos selecionados</h3>
+        <p>Esmaltes e insumos de qualidade, pensados pra saúde das suas unhas.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fa-solid fa-house"></i></div>
+        <h3>Ambiente acolhedor</h3>
+        <p>Um espaço tranquilo, pensado pra você relaxar durante o atendimento.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fa-solid fa-heart"></i>  </div>
+        <h3>Feito com carinho</h3>
+        <p>Atendimento próximo, do jeitinho que você gosta, sempre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="servicos">
   <div class="wrap">
     <div class="section-head reveal">
       <span class="section-tag">Serviços</span>
       <h2>Cada esmalte, um cuidado.</h2>
-      <p>Escolha o que combina com o seu momento — todos os atendimentos incluem preparo das cutículas e hidratação.</p>
+      <p>Do clássico ao nail art personalizado — encontre o serviço ideal para o seu momento.</p>
     </div>
-    <div class="swatches" id="swatchesContainer">
-  <!-- preenchido via JS -->
+    <div class="swatches reveal" id="swatchesContainer"></div>
+  </div>
+</section>
+
+<section class="insta" id="instagram">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-tag">Nos siga</span>
+      <h2>Veja o nosso trabalho no Instagram</h2>
+      <p>Acompanhe nossos trabalhos diários, tendências e inspirações. Fotos reais, resultados reais.</p>
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn-instagram" style="margin-top:22px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @jaquinha_naildesigner
+      </a>
+    </div>
+    <div class="insta-grid reveal">
+      <div class="insta-placeholder">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#F0D7C9"/><stop offset="100%" stop-color="#C97B58"/>
+          </linearGradient></defs>
+          <rect width="100" height="100" fill="url(#g1)"/>
+          <ellipse cx="50" cy="62" rx="14" ry="26" fill="rgba(255,255,255,.2)"/>
+        </svg>
+      </div>
+      <div class="insta-placeholder">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#94A584"/><stop offset="100%" stop-color="#E9C7B9"/>
+          </linearGradient></defs>
+          <rect width="100" height="100" fill="url(#g2)"/>
+          <ellipse cx="50" cy="62" rx="14" ry="26" fill="rgba(255,255,255,.2)"/>
+        </svg>
+      </div>
+      <div class="insta-placeholder">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#C97B58"/><stop offset="100%" stop-color="#4F2F3D"/>
+          </linearGradient></defs>
+          <rect width="100" height="100" fill="url(#g3)"/>
+          <ellipse cx="50" cy="62" rx="14" ry="26" fill="rgba(255,255,255,.2)"/>
+        </svg>
+      </div>
     </div>
   </div>
 </section>
@@ -351,7 +488,7 @@
             <input id="nome" name="nome" type="text" placeholder="Como podemos te chamar?" required>
           </div>
           <div class="form-row">
-            <label for="telefone">Telefone</label>
+            <label for="telefone">Telefone / WhatsApp</label>
             <input id="telefone" name="telefone" type="tel" placeholder="(48) 99999-0000" required>
           </div>
           <div class="form-row">
@@ -374,18 +511,35 @@
           <div class="submit-row">
             <button class="btn btn-primary" type="submit" id="submitBtn">Confirmar agendamento</button>
           </div>
+          
+          <a href="https://wa.me/5548996237293" target="_blank" rel="noopener noreferrer" class="link-whats">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#94A584">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12.05 2.062C6.495 2.062 1.984 6.573 1.984 12.128c0 1.922.535 3.72 1.461 5.255L2 22.062l4.833-1.422a10.02 10.02 0 004.848 1.242h.004c5.554 0 10.065-4.511 10.065-10.066 0-5.554-4.511-10.065-10.065-10.065h-.004zm0 18.39c-1.631 0-3.147-.47-4.424-1.27l-.318-.188-3.285.967.98-3.19-.207-.33A8.335 8.335 0 013.718 12.129c0-4.6 3.742-8.343 8.336-8.343 4.595 0 8.337 3.743 8.337 8.343 0 4.6-3.742 8.323-8.337 8.323z"/>
+            </svg>
+            Ou fale pelo WhatsApp
+          </a>
           <div class="form-msg" id="formMsg"></div>
         </form>
       </div>
     </div>
   </div>
-</section>
+ <footer class="site-footer">
+    <div class="footer-wrap">
+        <div class="footer-main">
 
-<footer>
-  <div class="wrap">
-    Florescer Studio · API em <code id="apiBase">http://127.0.0.1:8000</code> ·
-    <span id="footerNote">edite a constante API_BASE no código para apontar para o seu servidor</span>
-  </div>
+            <div class="footer-brand">
+                <span class="footer-tag">FLORESCER</span>
+
+                <h2>Studio de Unhas</h2>
+
+                <p>
+                    Beleza, cuidado e delicadeza em cada detalhe.
+                </p>
+            </div>
+
+        </div>
+    </div>
 </footer>
 <script>
 // -----------------------------------------------------------------
@@ -394,7 +548,6 @@ const API_BASE = "https://salao-girassol.onrender.com";
 // -----------------------------------------------------------------
 
 document.getElementById('apiUrlShown').textContent = API_BASE;
-document.getElementById('apiBase').textContent = API_BASE;
 
 const connBanner = document.getElementById('connBanner');
 const formMsg = document.getElementById('formMsg');
@@ -415,9 +568,9 @@ async function carregarServicos(){
     const servicos = await res.json();
 
     const container = document.getElementById('swatchesContainer');
-
     container.innerHTML = '';
     servicoSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+
     if(servicos.length === 0){
       container.innerHTML = '<p class="section-text">Nenhum serviço cadastrado ainda.</p>';
       return;
@@ -426,7 +579,6 @@ async function carregarServicos(){
       const card = document.createElement('div');
       card.className = 'swatch reveal in';
       card.innerHTML = `
-        <div class="dot" style="background:${servico.cor || '#C97B58'};"></div>
         <h3>${servico.nome}</h3>
         <p>${servico.descricao}</p>
         <div class="price">a partir de R$ ${Number(servico.preco).toFixed(2)}</div>
@@ -438,6 +590,7 @@ async function carregarServicos(){
       option.textContent = servico.nome;
       servicoSelect.appendChild(option);
     });
+    showConnError(false);
   }catch(err){
     showConnError(true);
   }

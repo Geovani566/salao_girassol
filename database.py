@@ -15,30 +15,28 @@ def tabela_servico():
     conexao = fazer_conexao()
     cursor = conexao.cursor()
     cursor.execute('''
-CREATE TABLE IF NOT EXISTS servicos (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-nome TEXT NOT NULL,
-descricao TEXT NOT NULL DEFAULT '',
-cor TEXT NOT NULL DEFAULT '#C97B58',
-duracao INTEGER NOT NULL,
-preco REAL NOT NULL
-)
-''')
+        CREATE TABLE IF NOT EXISTS servicos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            descricao TEXT NOT NULL DEFAULT '',
+            duracao INTEGER NOT NULL,
+            preco REAL NOT NULL
+        )
+    ''')
     conexao.commit()
     conexao.close()
 
 def garantir_colunas_servicos():
     conexao = fazer_conexao()
     cursor = conexao.cursor()
+
     cursor.execute("PRAGMA table_info(servicos)")
     colunas = [coluna[1] for coluna in cursor.fetchall()]
 
     if "descricao" not in colunas:
-        cursor.execute("ALTER TABLE servicos ADD COLUMN descricao TEXT NOT NULL DEFAULT ''")
-        conexao.commit()
-
-    if "cor" not in colunas:
-        cursor.execute("ALTER TABLE servicos ADD COLUMN cor TEXT NOT NULL DEFAULT '#C97B58'")
+        cursor.execute(
+            "ALTER TABLE servicos ADD COLUMN descricao TEXT NOT NULL DEFAULT ''"
+        )
         conexao.commit()
 
     conexao.close()
@@ -46,38 +44,67 @@ def garantir_colunas_servicos():
 def popular_servicos_iniciais():
     conexao = fazer_conexao()
     cursor = conexao.cursor()
+
     cursor.execute("SELECT COUNT(*) FROM servicos")
     total = cursor.fetchone()[0]
 
     if total == 0:
         cursor.executemany(
             """
-            INSERT INTO servicos(nome, descricao, cor, duracao, preco)
-            VALUES(?,?,?,?,?)
+            INSERT INTO servicos(nome, descricao, duracao, preco)
+            VALUES(?,?,?,?)
             """,
             [
-                ("Alongamento", "Tecnica para realcar o olhar com acabamento natural.", "#C97B58", 120, 120.00),
-                ("Manicure", "Cuidado completo para as unhas das maos.", "#94A584", 60, 45.00),
-                ("Pedicure", "Cuidado completo para os pes e acabamento delicado.", "#4F2F3D", 60, 50.00),
+                (
+                    "Alongamento",
+                    "Tecnica para realcar o olhar com acabamento natural.",
+                    120,
+                    120.00
+                ),
+                (
+                    "Manicure",
+                    "Cuidado completo para as unhas das maos.",
+                    60,
+                    45.00
+                ),
+                (
+                    "Pedicure",
+                    "Cuidado completo para os pes e acabamento delicado.",
+                    60,
+                    50.00
+                ),
             ],
         )
         conexao.commit()
+
     else:
         servicos_padrao = [
-            ("Tecnica para realcar o olhar com acabamento natural.", "#C97B58", "Alongamento"),
-            ("Cuidado completo para as unhas das maos.", "#94A584", "Manicure"),
-            ("Cuidado completo para os pes e acabamento delicado.", "#4F2F3D", "Pedicure"),
+            (
+                "Tecnica para realcar o olhar com acabamento natural.",
+                "Alongamento"
+            ),
+            (
+                "Cuidado completo para as unhas das maos.",
+                "Manicure"
+            ),
+            (
+                "Cuidado completo para os pes e acabamento delicado.",
+                "Pedicure"
+            ),
         ]
+
         cursor.executemany(
             """
             UPDATE servicos
-            SET
-                descricao = CASE WHEN descricao = '' THEN ? ELSE descricao END,
-                cor = CASE WHEN cor = '' OR cor = '#C97B58' THEN ? ELSE cor END
+            SET descricao = CASE
+                WHEN descricao = '' THEN ?
+                ELSE descricao
+            END
             WHERE nome = ?
             """,
             servicos_padrao,
         )
+
         conexao.commit()
 
     conexao.close()
