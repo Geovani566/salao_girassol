@@ -179,6 +179,12 @@ def criar_novo_servico(servico: novo_servico, _admin: None = Depends(require_adm
     )
     return {"status": "Serviço criado com sucesso!", "id": novo_id}
 
+@app.delete("/servicos/{id}")
+def deletar_servico(id: int, _admin: None = Depends(require_admin)):
+    if not crud.deletar_servico(id):
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    return {"status": "Serviço excluído com sucesso!"}
+
 @app.get("/horarios_trabalho")
 def listar_horarios_trabalho(_admin: None = Depends(require_admin)):
     return crud.listar_horarios_trabalho()

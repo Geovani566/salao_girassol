@@ -167,6 +167,10 @@
   .swatch .price{
     margin-top:16px; font-family:'Fraunces',serif; font-style:italic; color:var(--terracotta); font-size:15px;
   }
+  .swatch .duration{
+    display:inline-block; margin-top:12px; padding:5px 9px; border-radius:999px;
+    background:rgba(148,165,132,.16); color:var(--sage); font-size:12px; font-weight:600;
+  }
   .section-text{ color:var(--plum); opacity:.7; font-size:15px; }
 
   /* ---------- quem somos ---------- */
@@ -561,6 +565,15 @@ const horaHint = document.getElementById('horaHint');
 
 function showConnError(show){ connBanner.style.display = show ? 'block' : 'none'; }
 
+function formatDuration(minutes){
+  const total = Number(minutes || 0);
+  const hours = Math.floor(total / 60);
+  const remaining = total % 60;
+  if(hours && remaining) return `${hours}h ${remaining}min`;
+  if(hours) return `${hours}h`;
+  return `${remaining} min`;
+}
+
 async function carregarServicos(){
   try{
     const res = await fetch(`${API_BASE}/mostrar_servicos`);
@@ -581,6 +594,7 @@ async function carregarServicos(){
       card.innerHTML = `
         <h3>${servico.nome}</h3>
         <p>${servico.descricao}</p>
+        <div class="duration">Duração: ${formatDuration(servico.duracao)}</div>
         <div class="price">a partir de R$ ${Number(servico.preco).toFixed(2)}</div>
       `;
       container.appendChild(card);

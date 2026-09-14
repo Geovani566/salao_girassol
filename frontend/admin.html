@@ -297,7 +297,7 @@
   border-radius:20px;
   padding:20px 22px;
   display:grid;
-  grid-template-columns:1fr auto;
+  grid-template-columns:1fr auto auto;
   gap:16px;
   align-items:center;
 }
@@ -306,7 +306,7 @@
     .agenda-when{ text-align:left; }
     .calendar-shell{ grid-template-columns:1fr; }
     .service-card{
-  grid-template-columns:1fr auto;
+  grid-template-columns:1fr auto auto;
 }
     .services-shell{ grid-template-columns:1fr; }
     .schedule-row{ grid-template-columns:1fr 1fr; }
@@ -592,6 +592,14 @@ function toDateStr(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
 function formatMoney(value) {
   return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+function formatDuration(minutes) {
+  const total = Number(minutes || 0);
+  const hours = Math.floor(total / 60);
+  const remaining = total % 60;
+  if (hours && remaining) return `${hours}h ${remaining}min`;
+  if (hours) return `${hours}h`;
+  return `${remaining} min`;
+}
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -782,10 +790,33 @@ function renderServicos() {
         <div class="service-name">${escapeHTML(servico.nome)}</div>
         <div class="service-desc">${escapeHTML(servico.descricao)}</div>
       </div>
-      <div class="service-price">${formatMoney(servico.preco)}</div>
+      <div class="service-price">${formatMoney(servico.preco)}<br><small>Duração: ${formatDuration(servico.duracao)}</small></div>
+      <button class="icon-btn danger" type="button" data-action="delete-service" data-id="${servico.id}" title="Excluir serviço" aria-label="Excluir ${escapeHTML(servico.nome)}">✕</button>
     </div>
   `).join('');
 }
+
+servicesList.addEventListener('click', async event => {
+  const button = event.target.closest('button[data-action="delete-service"]');
+  if (!button) return;
+
+  const servico = allServicos.find(item => String(item.id) === button.dataset.id);
+  if (!servico || !confirm(`Excluir o serviço "${servico.nome}"?`)) return;
+
+  button.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/servicos/${servico.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const resposta = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(mensagemDaApi(resposta, 'Não foi possível excluir o serviço.'));
+    await fetchServicos();
+  } catch (erro) {
+    button.disabled = false;
+    alert(erro.message);
+  }
+});
 
 function renderCalendar() {
   const y = viewDate.getFullYear();
@@ -854,7 +885,7 @@ function renderDayPanel() {
           <div class="agenda-avatar">${initials(item.nome)}</div>
           <div class="agenda-info">
             <div class="name">${item.nome ?? 'Sem nome'}</div>
-            <div class="meta">${item.email ?? ''} ${item.telefone ? '· ' + item.telefone : ''}</div>
+            <div class="meta">${escapeHTML(item.servico || 'Serviço não informado')} ${item.telefone ? '· ' + escapeHTML(item.telefone) : ''}</div>
           </div>
           <div class="agenda-when">
             <div class="date">${item.hora ?? ''}</div>

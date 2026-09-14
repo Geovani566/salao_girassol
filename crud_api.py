@@ -150,6 +150,17 @@ class CrudApi:
             conn.close()
 
     @staticmethod
+    def deletar_servico(servico_id):
+        conn = fazer_conexao()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM servicos WHERE id = ?", (servico_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+        finally:
+            conn.close()
+
+    @staticmethod
     def listar_horarios_trabalho():
         conn = fazer_conexao()
         try:
