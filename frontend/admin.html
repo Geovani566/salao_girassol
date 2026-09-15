@@ -190,23 +190,17 @@
   .agenda-list{ display:flex; flex-direction:column; gap:14px; }
   .agenda-card{
     background:var(--paper); border:1px solid var(--line); border-radius:20px;
-    padding:20px 24px; display:flex; align-items:center; gap:20px;
+    padding:18px 20px; display:grid; grid-template-columns:minmax(0, 1fr) auto; align-items:center; gap:16px;
     transition: box-shadow .25s ease, transform .25s ease;
   }
   .agenda-card:hover{ box-shadow:0 14px 30px -20px rgba(79,47,61,.4); }
 
-  .agenda-avatar{
-    width:46px; height:46px; flex-shrink:0; border-radius:50% 50% 50% 14%;
-    background: linear-gradient(135deg, var(--terracotta), var(--blush));
-    display:flex; align-items:center; justify-content:center;
-    color:var(--paper); font-family:'Fraunces',serif; font-weight:600; font-size:17px;
-  }
-  .agenda-info{ flex:1; min-width:0; }
+  .agenda-info{ min-width:0; }
   .agenda-info .name{ font-family:'Fraunces',serif; font-size:17px; color:var(--plum); }
-  .agenda-info .meta{ font-size:13px; color:var(--plum); opacity:.65; margin-top:3px; }
-
-  .agenda-when{ text-align:right; font-size:13.5px; color:var(--plum); }
-  .agenda-when .date{ font-weight:600; }
+  .appointment-details{ display:grid; gap:5px; margin-top:8px; }
+  .appointment-detail{ display:grid; grid-template-columns:64px minmax(0, 1fr); align-items:baseline; gap:8px; font-size:12.5px; color:var(--plum); opacity:.72; min-width:0; }
+  .appointment-detail strong{ color:var(--terracotta); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+  .appointment-detail span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .agenda-actions{ display:flex; gap:8px; }
   .icon-btn{
@@ -302,8 +296,7 @@
   align-items:center;
 }
   @media (max-width: 900px){
-    .agenda-card{ flex-wrap:wrap; }
-    .agenda-when{ text-align:left; }
+    .agenda-card{ grid-template-columns:minmax(0, 1fr) auto; }
     .calendar-shell{ grid-template-columns:1fr; }
     .service-card{
   grid-template-columns:1fr auto auto;
@@ -312,6 +305,46 @@
     .schedule-row{ grid-template-columns:1fr 1fr; }
     .schedule-day{ grid-column:1 / -1; }
     .login-container{ padding:32px; }
+  }
+
+  @media (max-width: 600px){
+    .wrap{ padding:0 18px; }
+    nav .wrap{ padding:12px 18px; align-items:flex-start; gap:10px; }
+    .logo-text{ font-size:19px; }
+    .nav-actions{ gap:4px; }
+    .nav-tag, .nav-link{ display:none; }
+    .logout-btn{ padding:8px 13px; font-size:13px; }
+    section{ padding:40px 0; }
+    .section-head{ margin-bottom:26px; }
+    .section-head p{ font-size:15px; }
+    .agenda-toolbar{ align-items:stretch; gap:14px; margin-bottom:22px; }
+    .agenda-toolbar .btn{ width:100%; }
+    .calendar-card, .day-panel, .service-panel, .schedule-panel{ border-radius:22px; padding:18px; }
+    .cal-nav{ margin-bottom:16px; }
+    .cal-nav .month-label{ font-size:18px; }
+    .cal-weekdays, .cal-grid{ gap:3px; }
+    .cal-weekdays span{ font-size:9px; }
+    .cal-day{ border-radius:9px; }
+    .cal-day .num{ font-size:12px; }
+    .cal-count{ top:2px; right:3px; font-size:8px; }
+    .day-panel{ min-height:0; }
+    .agenda-card{ grid-template-columns:minmax(0, 1fr) auto; padding:16px; gap:12px; }
+    .agenda-info .name{ font-size:16px; }
+    .appointment-details{ gap:5px; }
+    .appointment-detail{ grid-template-columns:62px minmax(0, 1fr); max-width:100%; font-size:12px; }
+    .agenda-actions{ margin:0; flex-direction:column; }
+    .service-card{ grid-template-columns:1fr auto; padding:16px; gap:12px; }
+    .service-price{ grid-column:1; }
+    .service-card .icon-btn{ grid-column:2; grid-row:1 / span 2; }
+    .schedule-row{ grid-template-columns:1fr 1fr; padding:12px; gap:10px; }
+    .schedule-day, .schedule-active{ grid-column:1 / -1; }
+    .schedule-row label{ margin:0; }
+    .modal-backdrop{ padding:12px; }
+    .modal{ padding:22px 18px; border-radius:20px; }
+    .modal-actions{ flex-direction:column-reverse; }
+    .modal-actions .btn, .modal-actions .logout-btn{ width:100%; }
+    .login-screen{ padding:18px; align-items:flex-start; overflow-y:auto; }
+    .login-container{ margin:auto 0; padding:28px 22px; border-radius:24px; }
   }
 
   :focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
@@ -610,12 +643,6 @@ function escapeHTML(value) {
   }[char]));
 }
 
-function initials(name) {
-  if (!name) return '?';
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
-}
-
 function normalize(row) {
   if (Array.isArray(row)) {
     const [id, nome, email, telefone, data, hora] = row;
@@ -882,17 +909,18 @@ function renderDayPanel() {
     <div class="agenda-list">
       ${items.map(item => `
         <div class="agenda-card" data-id="${item.id}">
-          <div class="agenda-avatar">${initials(item.nome)}</div>
           <div class="agenda-info">
-            <div class="name">${item.nome ?? 'Sem nome'}</div>
-            <div class="meta">${escapeHTML(item.servico || 'Serviço não informado')} ${item.telefone ? '· ' + escapeHTML(item.telefone) : ''}</div>
-          </div>
-          <div class="agenda-when">
-            <div class="date">${item.hora ?? ''}</div>
+            <div class="name">${escapeHTML(item.nome || 'Sem nome')}</div>
+            <div class="appointment-details">
+              <div class="appointment-detail"><strong>Serviço:</strong><span>${escapeHTML(item.servico || 'Serviço não informado')}</span></div>
+              ${item.telefone ? `<div class="appointment-detail"><strong>Telefone:</strong><span>${escapeHTML(item.telefone)}</span></div>` : ''}
+              ${item.email ? `<div class="appointment-detail"><strong>E-mail:</strong><span>${escapeHTML(item.email)}</span></div>` : ''}
+              <div class="appointment-detail"><strong>Horário:</strong><span>${escapeHTML(item.hora || 'Não informado')}</span></div>
+            </div>
           </div>
           <div class="agenda-actions">
             <button class="icon-btn" data-action="edit" data-id="${item.id}" title="Editar data e horário" aria-label="Editar data e horário">✎</button>
-            <button class="icon-btn" data-action="delete" data-id="${item.id}">✕</button>
+            <button class="icon-btn danger" data-action="delete" data-id="${item.id}" title="Excluir agendamento" aria-label="Excluir agendamento">✕</button>
           </div>
         </div>
       `).join('')}
@@ -971,7 +999,7 @@ function fecharEdicaoAgendamento() {
 
 function mensagemDaApi(resposta, padrao) {
   if (typeof resposta?.detail === 'string') return resposta.detail;
-  if (Array.isArray(resposta?.detail)) return resposta.detail[0]?.msg || padrao;
+  if (Array.isArray(resposta?.deatil)) return resposta.detail[0]?.msg || padrao;
   return padrao;
 }
 
